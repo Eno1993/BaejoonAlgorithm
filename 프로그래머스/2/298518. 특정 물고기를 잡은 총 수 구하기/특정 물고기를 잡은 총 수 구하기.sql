@@ -1,4 +1,4 @@
-select count(*) as fish_count from fish_info fi
-left join fish_name_info fni
-on fi.fish_type = fni.fish_type
-where fni.fish_name = 'BASS' or fni.fish_name = 'SNAPPER'
+SELECT COUNT(*) AS FISH_COUNT FROM FISH_INFO
+LEFT JOIN FISH_NAME_INFO
+ON FISH_INFO.FISH_TYPE = FISH_NAME_INFO.FISH_TYPE
+WHERE FISH_NAME_INFO.FISH_NAME = 'BASS' OR FISH_NAME_INFO.FISH_NAME = 'SNAPPER'
