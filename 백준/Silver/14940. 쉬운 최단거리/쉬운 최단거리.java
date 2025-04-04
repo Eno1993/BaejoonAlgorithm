@@ -1,70 +1,71 @@
-import java.io.*;
-import java.util.*;
+//  쉬운 최단거리
 
-public class Main{
-    
-    public static class Node{
-        int x;
-        int y;
-        int num;
-        Node(int x, int y, int num){
-            this.x = x;
-            this.y = y;
-            this.num = num;
-        }
-    }
-    
-    public static void main(String[] args) throws IOException {
+import java.util.*;
+import java.lang.*;
+import java.io.*;
+
+class Main {
+
+    public static int[] x_ = {-1, 1, 0, 0};
+    public static int[] y_ = {0, 0, -1, 1};
+
+    public static void main(String[] args) throws IOException{
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        String[] rec = br.readLine().split(" ");
-        int row = Integer.parseInt(rec[0]);
-        int col = Integer.parseInt(rec[1]);
-        int[][] arr = new int[row][col];
-        int[][] answer = new int[row][col];
-        StringTokenizer st;
-        
-        Queue<Node> q = new LinkedList<>();
-        for(int i=0; i<row; i++){
-            st = new StringTokenizer(br.readLine(), " ");
-            for(int j=0; j<col; j++){
+        StringTokenizer st = new StringTokenizer(br.readLine());
+
+        int N = Integer.parseInt(st.nextToken());
+        int M = Integer.parseInt(st.nextToken());
+        int[][] arr = new int[N][M];
+        int[][] root = new int[N][M];
+        for (int[] r : root) {
+            Arrays.fill(r, -1);
+        }
+
+        int[] start = null;
+
+        for (int i=0; i<N; i++) {
+            st = new StringTokenizer(br.readLine());
+            for (int j=0; j<M; j++) {
                 arr[i][j] = Integer.parseInt(st.nextToken());
-                if(arr[i][j]==2){
-                    q.offer(new Node(i, j, 0));
-                    arr[i][j] = -1;
+                if (arr[i][j] == 2) {
+                    start = new int[]{i, j, 0};
+                    arr[i][j] = 0;
+                    root[i][j] = -1;
+                } else if (arr[i][j] == 1) {
+                    root[i][j] = -1;
+                } else if (arr[i][j] == 0) {
+                    root[i][j] = 0;
+                }
+
+            }
+        }
+
+        Queue<int[]> q = new LinkedList<>();
+        q.offer(start);
+
+        while (!q.isEmpty()) {
+            int[] now = q.poll();
+            root[now[0]][now[1]] = now[2];
+            for (int n=0; n<4; n++) {
+                int x = now[0] + x_[n];
+                int y = now[1] + y_[n];
+                if (0<=x && x<N && 0<=y && y<M) {
+                    if (arr[x][y] == 1) {
+                        arr[x][y] = 0;
+                        q.offer(new int[]{x, y, now[2]+1});
+                    }
                 }
             }
         }
-        
-        int[] x_ = {-1, 1, 0, 0};
-        int[] y_ = {0, 0, -1, 1};
-     
-        while(!q.isEmpty()){
-            Node now = q.poll();
-            
-            for(int n=0; n<4; n++){
-                int x = now.x+x_[n];
-                int y = now.y+y_[n];
-                if(0<=x&&x<row&&0<=y&&y<col&&arr[x][y]==1){
-                    arr[x][y] = -1;
-                    answer[x][y] = now.num+1;
-                    q.offer(new Node(x, y, answer[x][y]));
-                }
+
+        StringBuilder builder = new StringBuilder();
+        for (int i=0; i<N; i++) {
+            for (int j=0; j<M; j++) {
+                builder.append(root[i][j]).append(" ");
             }
+            builder.append("\n");
         }
-        
-        for(int i=0; i<answer.length; i++){
-            for(int j=0; j<answer[i].length; j++){
-                if(arr[i][j]==-1){
-                    System.out.print(answer[i][j]+" ");
-                }else if(arr[i][j]==0){
-                    System.out.print("0 ");
-                }else if(arr[i][j]==1){
-                    System.out.print("-1 ");
-                }
-            }
-            System.out.println();
-        }
-            
+        System.out.println(builder.toString());
     }
 }
