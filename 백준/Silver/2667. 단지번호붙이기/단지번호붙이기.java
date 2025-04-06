@@ -1,65 +1,73 @@
-import java.io.*;
+//  단지번호붙이기
+
 import java.util.*;
+import java.lang.*;
+import java.io.*;
+import java.util.stream.Collectors;
 
-public class Main{
+class Main {
 
-    public static class Node{
-        int x;
-        int y;
-        Node(int x, int y){
-            this.x = x;
-            this.y = y;
-        }
-    }
+    public static int[] x_ = {-1, 1, 0, 0};
+    public static int[] y_ = {0, 0, -1, 1};
 
-    public static void main(String[] args) throws IOException{
+    public static void main(String[] args) throws IOException {
 
-        //System.setIn(new FileInputStream("C:\\Baekjoon\\Baekjoon\\src\\main\\java\\input.txt"));
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        int K = Integer.parseInt(br.readLine());
+        int N = Integer.parseInt(br.readLine());
+        int[][] arr = new int[N][N];
 
-        int[][] arr = new int[K][K];
-        for(int i=0; i<K; i++){
-            String temp = br.readLine();
-            for(int j=0; j<K; j++){
-                arr[i][j] = temp.charAt(j)-'0';
+        for (int i=0; i<N; i++) {
+            String tmp = br.readLine();
+            for (int j=0; j<N; j++) {
+                arr[i][j] = tmp.charAt(j)-'0';
             }
         }
 
-        int[] _x = {-1, 1, 0, 0};
-        int[] _y = {0, 0, -1, 1};
-        List<Integer> list = new ArrayList<>();
+        Queue<int[]> q = new LinkedList<>();
+        int totalCnt = 0;
+        Map<Integer, Integer> map = new HashMap<>();
 
-        for(int i=0; i<K; i++){
-            for(int j=0; j<K; j++){
-                if(arr[i][j]==1){
+        for (int i=0; i<N; i++) {
+            for (int j=0; j<N; j++) {
+                if (arr[i][j] == 1) {
+                    totalCnt++;
+                    q.offer(new int[]{i, j});
                     arr[i][j] = 0;
-                    int count = 1;
-                    Queue<Node> q = new LinkedList<>();
-                    q.offer(new Node(i, j));
 
-                    while(!q.isEmpty()){
-                        Node now = q.poll();
-                        for(int n=0; n<4; n++){
-                            int x = now.x + _x[n];
-                            int y = now.y + _y[n];
-                            if(0<=x&&x<K&&0<=y&&y<K&&arr[x][y]==1){
+                    int cnt = 0;
+                    while (!q.isEmpty()) {
+                        int[] now = q.poll();
+                        cnt++;
+
+                        for (int n=0; n<4; n++) {
+                            int x = now[0] + x_[n];
+                            int y = now[1] + y_[n];
+
+                            if (0<=x && x<N && 0<=y && y<N && arr[x][y]==1) {
                                 arr[x][y] = 0;
-                                count++;
-                                q.offer(new Node(x, y));
+                                q.offer(new int[]{x, y});
                             }
                         }
                     }
-                    list.add(count);
+                    if (!map.containsKey(cnt)) {
+                        map.put(cnt, 1);
+                    } else {
+                        map.put(cnt, map.get(cnt) + 1);
+                    }
                 }
             }
         }
-        Collections.sort(list);
 
-        System.out.println(list.size());
-        for(int n : list){
-            System.out.println(n);
+        StringBuilder builder = new StringBuilder();
+        builder.append(totalCnt).append('\n');
+
+        List<Integer> list = map.keySet().stream().sorted().collect(Collectors.toList());
+        for (Integer key : list) {
+            for (int n=0; n<map.get(key); n++) {
+                builder.append(key).append('\n');
+            }
         }
 
+        System.out.print(builder.toString());
     }
 }
