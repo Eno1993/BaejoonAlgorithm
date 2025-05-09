@@ -35,59 +35,51 @@ class Main {
         }
 
         while (true) {
-            if (!goHunt()) break; // 더 이상 먹을 물고기 없으면 종료
+            if (!goHunt()) {
+                break;
+            }
         }
 
         System.out.print(answer);
 
     }
 
-    public static boolean goHunt() {
-        boolean[][] visit = new boolean[N][N];
-
-        PriorityQueue<int[]> q = new PriorityQueue<>((a, b) -> {
-            if (a[2] != b[2]) return Integer.compare(a[2], b[2]); // 거리 우선
-            if (a[0] != b[0]) return Integer.compare(a[0], b[0]); // 위쪽 우선
-            return Integer.compare(a[1], b[1]);                   // 왼쪽 우선
+    public static boolean goHunt () {
+        Queue<int[]> q = new PriorityQueue<>((a, b) -> {
+            if (a[2] != b[2]) return Integer.compare(a[2], b[2]);
+            if (a[0] != b[0]) return Integer.compare(a[0], b[0]);
+            return Integer.compare(a[1], b[1]);
         });
-
-        // 큐에 시작 위치 넣기
         q.offer(new int[]{shark[0], shark[1], 0});
+
+        boolean[][] visit = new boolean[N][N];
         visit[shark[0]][shark[1]] = true;
 
         while (!q.isEmpty()) {
-            int[] now = q.poll();
-            int x = now[0], y = now[1], dist = now[2];
+            int[] n = q.poll();
 
-            // 먹을 수 있는 물고기 발견
-            if (arr[x][y] > 0 && arr[x][y] < sharkSize) {
-                // 물고기 먹음
-                shark[0] = x;
-                shark[1] = y;
-                arr[x][y] = 0; // 물고기 먹었으니까 위치 비움
-                answer += dist; // 거리 더하기
+            if (0<arr[n[0]][n[1]] && arr[n[0]][n[1]]<sharkSize) {
+                shark[0] = n[0];
+                shark[1] = n[1];
                 upgrade++;
-
-                // 상어가 일정 크기 이상 먹었으면 크기 증가
-                if (upgrade == sharkSize) {
+                if (sharkSize==upgrade) {
                     sharkSize++;
                     upgrade = 0;
                 }
-                return true; // 먹을 수 있는 물고기를 찾았으면 바로 리턴
+                answer += n[2];
+                arr[n[0]][n[1]] = 0;
+                return true;
             }
 
-            // 상하좌우 탐색
-            for (int i = 0; i < 4; i++) {
-                int nx = x + x_[i];
-                int ny = y + y_[i];
-
-                if (0 <= nx && nx < N && 0 <= ny && ny < N && !visit[nx][ny] && arr[nx][ny] <= sharkSize) {
-                    visit[nx][ny] = true;
-                    q.offer(new int[]{nx, ny, dist + 1});
+            for (int i=0; i<4; i++) {
+                int x = n[0] + x_[i];
+                int y = n[1] + y_[i];
+                if (0<=x && x<N && 0<=y && y<N && !visit[x][y] && arr[x][y]<=sharkSize) {
+                    visit[x][y] = true;
+                    q.offer(new int[]{x, y, n[2]+1});
                 }
             }
         }
-
-        return false; // 더 이상 먹을 물고기 없음
+        return false;
     }
 }
